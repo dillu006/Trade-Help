@@ -1,0 +1,11 @@
+import axios from "axios";
+const ITEMS = [
+  ["RELIANCE","Reliance","EQ","NSE"],["TCS","TCS","EQ","NSE"],["INFY","Infosys","EQ","NSE"],
+  ["HDFCBANK","HDFC Bank","EQ","NSE"],["ICICIBANK","ICICI Bank","EQ","NSE"],["SBIN","SBI","EQ","NSE"],
+  ["TATAMOTORS","Tata Motors","EQ","NSE"],["BHARTIARTL","Bharti Airtel","EQ","NSE"],
+  ["NIFTY 50","NIFTY 50","INDEX","NSE"],["NIFTY BANK","BANK NIFTY","INDEX","NSE"],["INDIA VIX","INDIA VIX","INDEX","NSE"]
+];
+const headers=t=>({Accept:"application/json",Authorization:`Bearer ${t}`});
+async function find(q,s,e,t){const r=await axios.get("https://api.upstox.com/v2/instruments/search",{params:{query:q,segment:s,exchange:e,page_number:1,page_size:10},headers:headers(t),timeout:10000});return (r.data?.data||[]).find(x=>x.instrument_type==="EQ"||x.instrument_type==="INDEX")||(r.data?.data||[])[0];}
+function item(label,q){const o=q?.ohlc||{},p=Number(q?.last_price||0),prev=Number(q?.prev_close_price??o.close??0),c=Number(q?.net_change??p-prev);return {label,price:p,change:c,percent:prev?c/prev*100:0,high:Number(o.high||0),low:Number(o.low||0),volume:Number(o.volume??q?.volume??0)};}
+export default async function handler(req,res){const t=process.env.UPSTOX_ACCESS_TOKEN;if(!t)return res.status(500).json({ok:false,error:"UPSTOX_ACCESS_TOKEN is not configured."});try{const found=(await Promise.all(ITEMS.map(async x=>{try{const y=await find(x[0],x[2],x[3],t);return {...x,key:y?.instrument_key||null}}catch{return {...x,key:null}}}))).filter(x=>x.key);if(!found.length)throw new Error();const r=await axios.get("https://api.upstox.com/v3/market-quote/quotes",{params:{instrument_key:found.map(x=>x.key).join(",")},headers:headers(t),timeout:10000});const raw=r.data?.data||{}, entries=Object.entries(raw);const get=k=>raw[k]||raw[k.replace("|",":")]||entries.find(([a])=>a.endsWith(":"+k.split("|").pop()))?.[1];const out=found.map(x=>{const q=get(x.key);return q?{...item(x[1],q),segment:x[2]}:null}).filter(Boolean);res.setHeader("Cache-Control","no-store");res.json({ok:true,source:"Upstox Market Quote V3",updatedAt:new Date().toISOString(),indexes:out.filter(x=>x.segment==="INDEX"),stocks:out.filter(x=>x.segment==="EQ")})}catch(e){res.status(e.response?.status||500).json({ok:false,error:"Upstox market-data request failed."})}}
