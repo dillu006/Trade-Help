@@ -1,4 +1,4 @@
-import express from "express";
+     import express from "express";
 import dotenv from "dotenv";
 import axios from "axios";
 import path from "path";
@@ -65,7 +65,6 @@ async function resolveInstruments() {
   const entries = await Promise.all(all.map(async item => {
     try {
       if (item.segment === "INDEX") {
-        // Upstox index search may return the index instrument directly.
         const found = await searchInstrument(item.symbol, "INDEX", "NSE");
         return [item.label, found?.instrument_key || null];
       }
@@ -182,4 +181,4 @@ server.on("error", (err) => {
     console.error("[FATAL] Server failed to start:", err?.stack || err);
   }
   process.exit(1);
-});
+}); 
