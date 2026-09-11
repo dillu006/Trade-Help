@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TradeVoice — Live Market Alerts</title>
+<style>
+:root{--bg:#07140f;--card:#0d2118;--line:#1b3a2a;--text:#eef8f1;--muted:#9fb7a8;--accent:#52e58a;--danger:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#06110c,#0a1912);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:18px}.hero{padding:12px 4px 18px}.hero h1{margin:0;font-size:30px}.hero p{color:var(--muted);margin:6px 0}
+.status{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#091b13;margin:10px 0 16px;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.card{background:rgba(13,33,24,.94);border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:0 8px 24px #0004}.name{font-weight:700}.price{font-size:26px;font-weight:800;margin-top:8px}.up{color:var(--accent)}.down{color:var(--danger)}.muted{color:var(--muted);font-size:13px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}button{border:1px solid var(--line);background:#102a1d;color:var(--text);border-radius:10px;padding:10px 13px;font-weight:700}button:active{transform:scale(.98)}.empty{color:var(--muted);padding:18px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>🎙️ TradeVoice</h1>
+    <p>Live market data • Telugu voice alerts • Upstox</p>
+  </section>
+  <div id="status" class="status">Connecting…</div>
+  <div class="toolbar">
+    <button id="refresh">↻ Refresh</button>
+    <button id="voice">🔊 Voice ON</button>
+  </div>
+  <h3>📊 Indices</h3><div id="indexes" class="grid"></div>
+  <h3>📈 Stocks</h3><div id="stocks" class="grid"></div>
+  <p class="muted">Market data is provided by Upstox. This dashboard is informational and does not place orders.</p>
+</div>
+<script>
+let voiceOn = true;
+const statusEl = document.getElementById("status");
+const fmt = n => Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+function card(x){
+  const cls = x.percent >= 0 ? "up":"down";
+  const sign = x.percent >= 0 ? "+":"";
+  return `<div class="card"><div class="name">${x.label}</div>
+    <div class="price">₹${fmt(x.price)}</div>
+    <div class="${cls}">${sign}${fmt(x.change)} (${sign}${fmt(x.percent)}%)</div>
+    <div class="muted">H ₹${fmt(x.high)} · L ₹${fmt(x.low)} · Vol ${fmt(x.volume)}</div>
+  </div>`;
+}
+function speak(text){
+  if(!voiceOn || !("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "te-IN";
+  speechSynthesis.speak(u);
+}
+async function load(){
+  statusEl.textContent = "Loading live market data…";
+  try{
+    const r = await fetch("/api/market",{cache:"no-store"});
+    const d = await r.json();
+    if(!r.ok || !d.ok) throw new Error(d.detail?.errors?.[0]?.message || d.error || "Unknown error");
+    document.getElementById("indexes").innerHTML = d.indexes.length ? d.indexes.map(card).join("") : '<div class="empty">Index data unavailable</div>';
+    document.getElementById("stocks").innerHTML = d.stocks.length ? d.stocks.map(card).join("") : '<div class="empty">Stock data unavailable</div>';
+    statusEl.textContent = "🟢 LIVE • Updated " + new Date(d.updatedAt).toLocaleTimeString();
+  }catch(e){
+    statusEl.textContent = "🔴 " + e.message;
+  }
+}
+document.getElementById("refresh").onclick = load;
+document.getElementById("voice").onclick = () => {
+  voiceOn = !voiceOn;
+  document.getElementById("voice").textContent = voiceOn ? "🔊 Voice ON" : "🔇 Voice OFF";
+  if(voiceOn) speak("TradeVoice voice alerts on");
+};
+load();
+setInterval(load, 10000);
+</script>
+</body>
+</html>
