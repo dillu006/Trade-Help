@@ -1,0 +1,1 @@
+{"name":"tradevoice-final","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js","dev":"node --watch server.js"},"engines":{"node":">=18"},"dependencies":{"axios":"^1.11.0","dotenv":"^17.2.1","express":"^5.1.0","upstox-js-sdk":"^2.30.0"}}
