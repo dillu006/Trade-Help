@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>TradeVoice — Indian Markets</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#17191d;--muted:#707782;--line:#e5e8ec;--green:#138a43;--red:#d83b3b;--blue:#2468e8;--dark:#111827;--soft:#f2f5f8}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}.app{max-width:1280px;margin:auto}.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;padding:12px 18px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand{font-size:21px;font-weight:900}.brand span{color:var(--green)}.live{font-size:12px;color:var(--green);font-weight:800}.search{margin-top:11px;background:#f0f2f5;border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:8px}.search input{width:100%;border:0;outline:0;background:transparent;font-size:15px}
+.tabs{display:flex;gap:7px;overflow:auto;margin-top:11px;padding-bottom:2px}.tab{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;white-space:nowrap;font-size:12px;font-weight:750}.tab.active{background:var(--dark);color:#fff}
+main{padding:16px 18px 35px}.section{font-size:16px;font-weight:850;margin:17px 0 10px}.indices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:14px}.card{padding:14px}.muted{color:var(--muted);font-size:12px}.title{font-weight:800}.price{font-size:21px;font-weight:900;margin-top:6px}.up{color:var(--green)}.down{color:var(--red)}
+.layout{display:grid;grid-template-columns:390px minmax(0,1fr);gap:14px}.list{overflow:hidden}.stock{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--line);cursor:pointer}.stock:last-child{border:0}.stock:hover{background:#fafbfd}.selected{background:#f1f6ff;border-left:3px solid var(--blue)}.icon{width:38px;height:38px;border-radius:10px;background:#edf4ff;color:#2865dc;display:grid;place-items:center;font-weight:900}.metrics{text-align:right;min-width:120px}.chartpanel{padding:16px}.charthead{display:flex;justify-content:space-between;gap:12px}.clock{text-align:right;white-space:nowrap}.chartbox{height:260px;margin-top:12px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}.chartbox svg{width:100%;height:100%}.chartgrid line{stroke:#edf0f3;stroke-width:1}.chartline{fill:none;stroke:var(--blue);stroke-width:3}.chartarea{fill:rgba(36,104,232,.08)}.range{display:flex;gap:6px;margin-top:9px}.range button{border:0;background:var(--soft);padding:7px 10px;border-radius:7px;font-size:12px;font-weight:750}.range button.active{background:#dfe9ff;color:#205dcc}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.stat{background:#f7f8fa;border-radius:9px;padding:9px;min-width:0}.stat b{display:block;margin-top:4px;overflow:hidden;text-overflow:ellipsis}.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.tools button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:10px 12px;font-weight:800}.tools .primary{background:var(--dark);color:#fff}.funds{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:12px}.fund{background:#f7f8fa;border-radius:9px;padding:9px}.fund b{display:block;margin-top:3px}.note{margin-top:12px;padding:11px;background:#f7f8fa;border-radius:10px;font-size:12px;color:#5f6670}.datebar{margin-top:12px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.voicebar{margin-top:12px;padding:12px;background:#f8fafc;border:1px solid var(--line);border-radius:11px}.voicecontrols{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.voicecontrols select,.voicecontrols button{min-height:42px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px}.voicecontrols button{font-weight:800}.voicecontrols .on{background:var(--green);color:#fff}.voicehint{font-size:11px;color:var(--muted);margin-top:7px}.bottom{display:none}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:9px;display:none;z-index:50;max-width:90%;text-align:center}
+.sheetback{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:flex-end;z-index:40}.sheet{background:#fff;border-radius:18px 18px 0 0;width:min(600px,100%);margin:auto;padding:16px}.sheet button{width:100%;padding:12px;margin-top:8px;border:1px solid var(--line);background:#fff;border-radius:10px;text-align:left;font-weight:750}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.indices{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.funds{grid-template-columns:repeat(2,1fr)}.bottom{display:block;position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:20}.nav{display:grid;grid-template-columns:repeat(6,1fr)}.nav button{border:0;background:#fff;padding:9px 2px;color:#777;font-size:10.5px}.nav b{display:block;font-size:18px}.nav .active{color:var(--green)}}
+.news-item{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}.news-item:last-child{border:0}.news-tag{flex:none;font-size:18px;line-height:1}.news-title{font-weight:750;font-size:13.5px}.news-meta{font-size:11px;color:var(--muted);margin-top:3px}.news-item.crisis{background:#fff6f6}
+.holdingform{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.holdingform select,.holdingform input{padding:9px;border:1px solid var(--line);border-radius:8px}.holdingform button{grid-column:span 4;padding:10px;border:0;border-radius:8px;background:var(--dark);color:#fff;font-weight:800}
+@media(max-width:600px){.holdingform{grid-template-columns:1fr 1fr}.holdingform button{grid-column:span 2}}
+@media(max-width:430px){main{padding:12px}.top{padding:11px 12px}.metrics{min-width:95px}.stock{grid-template-columns:36px minmax(0,1fr) auto}.icon{width:34px;height:34px}.chartbox{height:220px}}
+
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:grid;place-items:center;z-index:100}
+.modal.hidden{display:none}.modal-card{width:min(560px,92vw);max-height:86vh;overflow:auto;background:var(--panel,#0d1825);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.modal-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.modal-head h3{margin:4px 0 6px}.eyebrow{font-size:11px;letter-spacing:.14em;opacity:.65}.muted{opacity:.68}.icon-btn{border:0;background:transparent;color:inherit;font-size:20px;cursor:pointer}
+.command-list{display:grid;gap:10px;margin:18px 0}.command-list div{padding:13px 14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025)}.command-list b{display:block}.command-list span{display:block;margin-top:4px;font-size:12px;opacity:.65}.command-status{padding:12px;border-radius:12px;background:rgba(0,180,130,.08);margin-bottom:12px;font-size:13px}.full{width:100%}
+
+
+.order-preview{margin:12px 0;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.035)}
+.order-preview .order-title{font-weight:700;font-size:17px;margin-bottom:8px}.order-preview .order-meta{opacity:.75;font-size:13px;margin-bottom:12px}
+.order-preview .confirm{display:flex;gap:10px}.order-preview button{flex:1}
+
+</style>
+
+<style>
+.portfolio-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.portfolio-summary>div{padding:14px;border:1px solid var(--border,#ddd);border-radius:12px;display:flex;flex-direction:column;gap:6px}
+.portfolio-summary strong{font-size:20px}
+.chart-wrap{width:100%;overflow:hidden;border:1px solid var(--border,#ddd);border-radius:12px;padding:8px}
+#portfolioChart{width:100%;display:block}
+.holding{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border,#ddd)}
+@media(max-width:600px){.portfolio-summary{grid-template-columns:1fr}.holding{grid-template-columns:1fr auto}}
+</style>
+
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="row"><div class="brand">Trade<span>Voice</span></div><div class="live" id="status">● Connecting</div></div>
+  <div class="search">⌕ <input id="search" placeholder="Search company, stock, IPO, MF, gold..." autocomplete="off"></div>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-section="Stocks">Stocks</button><button class="tab" data-section="Indices">Indices</button>
+    <button class="tab" data-section="IPO">IPO</button><button class="tab" data-section="Mutual Funds">Mutual Funds</button>
+    <button class="tab" data-section="Gold">Gold</button><button class="tab" data-section="Watchlist">Watchlist</button>
+  </div>
+</header>
+
+<main>
+<div id="homeSection" class="app-section">
+<div class="section">Market overview</div>
+<div class="indices" id="indices"></div>
+
+<div class="section">Global markets <span class="muted" style="font-weight:600;font-size:11px">(context, not a prediction)</span></div>
+<div class="indices" id="globalIndices"></div>
+<div class="section">Foreign stocks</div><div class="indices" id="globalStocks"></div>
+<div class="voicehint" id="globalNote" style="margin:-4px 0 6px"></div>
+
+<div class="datebar"><span>📅 <b id="date">—</b></span><span>🕐 <b id="clock">—</b></span><span id="feed">Market feed: checking…</span></div>
+
+<div class="section">Stocks</div>
+<div class="layout">
+  <div class="panel list" id="stocks"></div>
+  <section class="panel chartpanel">
+    <div class="charthead">
+      <div><div class="muted">Selected stock</div><div class="title" id="selName">Select a stock</div><div class="price" id="selPrice">—</div><div id="selChange">—</div><div class="muted" id="selRange" style="margin-top:5px">—</div></div>
+      <div class="clock"><div class="muted">Live time</div><b id="detailClock">—</b></div>
+    </div>
+    <div class="chartbox">
+      <svg id="chart" viewBox="0 0 800 260" preserveAspectRatio="none" aria-label="Selected stock price chart">
+        <g class="chartgrid"><line x1="0" y1="52" x2="800" y2="52"/><line x1="0" y1="104" x2="800" y2="104"/><line x1="0" y1="156" x2="800" y2="156"/><line x1="0" y1="208" x2="800" y2="208"/></g>
+        <polygon id="area" class="chartarea" points=""></polygon><polyline id="line" class="chartline" points=""></polyline>
+      </svg>
+    </div>
+    <div class="range" id="ranges"><button class="active" data-range="1D">1D</button><button data-range="1W">1W</button><button data-range="1M">1M</button><button data-range="1Y">1Y</button></div>
+
+    <div class="stats" id="stats"></div>
+    <div class="funds">
+      <div class="fund"><span class="muted">PE</span><b id="pe">—</b></div>
+      <div class="fund"><span class="muted">ROCE</span><b id="roce">—</b></div>
+      <div class="fund"><span class="muted">ROC</span><b id="roc">—</b></div>
+      <div class="fund"><span class="muted">P/B</span><b id="pb">—</b></div>
+      <div class="fund"><span class="muted">PEG</span><b id="peg">—</b></div>
+    </div>
+
+    <div class="voicebar">
+      <div class="row"><div class="title">🔊 Live voice</div><span class="muted" id="voiceState">Off</span></div>
+      <div class="voicecontrols">
+        <select id="voiceLang" aria-label="Voice language">
+          <option value="en-IN">English</option><option value="hi-IN">हिन्दी</option><option value="te-IN">తెలుగు</option>
+        </select>
+        <button id="voiceBtn" class="primary">Start 1-sec voice</button>
+        <button id="stopVoice">Stop</button>
+      </div>
+      <div class="voicehint">Every update speaks the selected stock, price, date, year and exact time including seconds. Actual available voices depend on the browser/device.</div>
+    </div>
+
+    <div class="tools"><button id="alertBtn">🔔 Price alert</button><button id="watchBtn">☆ Watchlist</button><button id="fundBtn">📊 Fundamentals</button><button id="micBtn" class="primary">🎤 Hey Dillu</button></div>
+    <div class="note" id="info">Select a company to inspect its live chart and market details. Verified fundamentals are shown only when a trusted fundamentals feed is connected.</div>
+  </section>
+</div>
+</div>
+
+<section id="portfolioPanel" class="app-section panel" style="display:none;padding:16px">
+  <div class="section" style="margin-top:0">Portfolio</div>
+  <div class="portfolio-summary">
+    <div><span class="muted">Invested</span><strong id="portfolioInvested">₹0.00</strong></div>
+    <div><span class="muted">Current value</span><strong id="portfolioCurrent">₹0.00</strong></div>
+    <div><span class="muted">P&amp;L</span><strong id="portfolioPnl">₹0.00</strong></div>
+  </div>
+  <div class="range" id="portfolioRanges"><button class="active" data-range="1D">1D</button><button data-range="1W">1W</button><button data-range="1M">1M</button><button data-range="1Y">1Y</button></div>
+  <div class="chart-wrap" style="margin-top:10px"><canvas id="portfolioChart" height="180"></canvas></div>
+  <div id="portfolioHoldings" style="margin-top:6px"></div>
+  <div class="holdingform">
+    <select id="holdSymbol"></select>
+    <input id="holdQty" type="number" min="1" placeholder="Qty">
+    <input id="holdAvg" type="number" min="0" step="0.01" placeholder="Avg buy price ₹">
+    <button id="holdAdd">+ Add holding</button>
+  </div>
+  <div class="note">Holdings are stored on this device only. Prices use the same live/last-known feed as the Stocks tab, so a stock that hasn't updated today keeps showing its last known price instead of going blank.</div>
+</section>
+
+<section id="newsPanel" class="app-section panel" style="display:none;padding:16px">
+  <div class="row" style="margin-bottom:6px"><div class="section" style="margin:0">Market-moving news</div><button id="newsRefresh" style="border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 10px;font-weight:800">⟳ Refresh</button></div>
+  <div class="voicecontrols" style="margin-bottom:10px">
+    <select id="newsVoiceLang"><option value="en">English</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option><option value="ta">தமிழ்</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="bn">বাংলা</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option></select>
+    <button id="newsSpeakBtn" class="primary">🔊 Read headlines aloud</button>
+    <button id="newsAutoBtn">Auto-read: Off</button>
+  </div>
+  <div id="newsList" class="panel"></div>
+  <div class="note">Headlines come from Google News and are informational only — not financial advice or a crash prediction. 🪖 war · 🌊 flood/disaster · 📉 crash · 🥇 gold · 💵 currency.</div>
+</section>
+
+<section id="ordersPanel" class="app-section panel" style="display:none;padding:16px">
+  <div class="section" style="margin-top:0">Orders</div>
+  <div class="note">Order placement isn't connected yet. Use "Hey Dillu, buy 10 Reliance" for an order preview — real execution needs a broker order API.</div>
+</section>
+
+<section id="profilePanel" class="app-section panel" style="display:none;padding:16px">
+  <div class="section" style="margin-top:0">Profile</div>
+  <div class="note">Broker/account connection isn't configured yet.</div>
+</section>
+
+</main>
+<footer class="bottom"><div class="nav"><button class="active" data-section="Home"><b>⌂</b>Home</button><button data-section="Watchlist"><b>☆</b>Watchlist</button><button data-section="Portfolio"><b>▥</b>Portfolio</button><button data-section="News"><b>📰</b>News</button><button data-section="Orders"><b>▤</b>Orders</button><button data-section="Profile"><b>☻</b>Profile</button></div></footer>
+</div>
+<div class="toast" id="toast"></div>
+<div class="sheetback" id="sheetback"><div class="sheet"><div class="title" id="sheetTitle">Stock</div><button id="sheetAlert">🔔 Set price alert</button><button id="sheetVoice">🔊 Start one-second voice</button><button id="sheetFund">📊 View fundamentals</button><button id="sheetClose">✕ Close</button></div></div>
+
+<script>
+"use strict";
+let market={stocks:[],indices:[]},selected=null,chartPoints=[],voice=false,voiceTimer=null,speaking=false,watchlist=new Set(),alerts=[],currentRange="1D";
+const STOCK_DEFAULTS=[["RELIANCE","Reliance Industries"],["TCS","Tata Consultancy Services"],["INFY","Infosys"],["HDFCBANK","HDFC Bank"],["ICICIBANK","ICICI Bank"],["SBIN","State Bank of India"],["TATAMOTORS","Tata Motors"],["BHARTIARTL","Bharti Airtel"]].map(([symbol,name])=>({symbol,name}));
+const GLOBAL_STOCK_LIST=[["AAPL","Apple (US)"],["MSFT","Microsoft (US)"],["NVDA","NVIDIA (US)"],["TSLA","Tesla (US)"],["AMZN","Amazon (US)"],["GOOGL","Alphabet (US)"],["META","Meta (US)"]].map(([symbol,name])=>({symbol,name}));
+let lastGlobalStocksData=[];
+const $=id=>document.getElementById(id);
+const money=n=>Number.isFinite(Number(n))?Number(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const safe=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+function toast(s){$("toast").textContent=s;$("toast").style.display="block";clearTimeout(window._toast);window._toast=setTimeout(()=>$("toast").style.display="none",2200)}
+function nowParts(){const d=new Date();return {d, date:d.toLocaleDateString("en-IN",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}),time:d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})}}
+function updateClock(){const n=nowParts();$("date").textContent=n.date;$("clock").textContent=n.time;$("detailClock").textContent=n.time}
+function findVoice(locale){const voices=("speechSynthesis"in window)?speechSynthesis.getVoices():[];return voices.find(v=>v.lang.toLowerCase()===locale.toLowerCase())||voices.find(v=>v.lang.toLowerCase().startsWith(locale.slice(0,2).toLowerCase()))||null}
+function priceForSpeech(value){
+  const n=Number(value);
+  if(!Number.isFinite(n)) return "price unavailable";
+  return n.toFixed(2).replace(".", " point ").split("").join(" ");
+}
+function spokenText(q){
+  const lang=$("voiceLang").value;
+  const price=priceForSpeech(q.ltp);
+  if(lang==="te-IN") return `${q.symbol}. ప్రస్తుత ధర ${price} రూపాయలు.`;
+  if(lang==="hi-IN") return `${q.symbol}. मौजूदा कीमत ${price} रुपये।`;
+  return `${q.symbol}. Current price ${price} rupees.`;
+}
+function speakCurrent(){
+  if(!voice||!selected||!("speechSynthesis"in window))return;
+  const q=market.stocks.find(x=>x.key===selected.key);if(!q)return;
+  if(!speaking){
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(spokenText(q));
+    u.lang=$("voiceLang").value;
+    const v=findVoice(u.lang);if(v)u.voice=v;
+    u.rate=.55;u.pitch=1;u.volume=1;
+    u.onend=()=>{speaking=false};u.onerror=()=>{speaking=false};
+    speaking=true;speechSynthesis.speak(u);
+  }
+  clearTimeout(voiceTimer);
+  voiceTimer=setTimeout(()=>{speaking=false;speakCurrent()},6500);
+}
+function startVoice(){if(!("speechSynthesis"in window)){toast("This browser has no speech synthesis");return}voice=true;$("voiceState").textContent=`ON · ${$("voiceLang").selectedOptions[0].text}`;$("voiceBtn").textContent="Voice ON";$("voiceBtn").classList.add("on");toast("1-second voice started");speakCurrent()}
+function stopVoice(){voice=false;clearTimeout(voiceTimer);if("speechSynthesis"in window)speechSynthesis.cancel();speaking=false;$("voiceState").textContent="Off";$("voiceBtn").textContent="Start 1-sec voice";$("voiceBtn").classList.remove("on")}
+function renderIndices(){$("indices").innerHTML=market.indices.map(x=>`<div class="card"><div class="title">${safe(x.name)}</div><div class="muted">NSE live</div><div class="price">₹${money(x.ltp)}</div><div class="${Number(x.change)>=0?"up":"down"}">${Number(x.change)>=0?"+":""}${money(x.change)} (${Number(x.percent||0).toFixed(2)}%)</div></div>`).join("")}
+function renderStocks(filter=""){const rows=market.stocks.filter(x=>!filter||`${x.symbol} ${x.name}`.toLowerCase().includes(filter.toLowerCase()));
+$("stocks").innerHTML=rows.map(x=>`<div class="stock ${selected?.key===x.key?"selected":""}" data-key="${safe(x.key)}" data-symbol="${safe(x.symbol)}"><div class="icon">${safe(x.icon)}</div><div><div class="title">${safe(x.symbol)}</div><div class="muted">${safe(x.name)}</div></div><div class="metrics"><div class="title">₹${money(x.ltp)}</div><div class="${Number(x.change)>=0?"up":"down"}">${Number(x.change)>=0?"+":""}${money(x.change)} (${Number(x.percent||0).toFixed(2)}%)</div></div></div>`).join("")||`<div style="padding:20px;color:#707782">No matching stock</div>`;
+document.querySelectorAll(".stock").forEach(el=>{let timer;const open=()=>{selected=market.stocks.find(x=>x.key===el.dataset.key);window.selectedSymbol=selected?.symbol||null;renderStocks($("search").value);renderSelected();loadChartHistory()};el.addEventListener("click",open);el.addEventListener("pointerdown",()=>{timer=setTimeout(()=>openSheet(),600)});["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev,()=>clearTimeout(timer)))})}
+function renderSelected(){if(!selected)return;$("selName").textContent=selected.symbol;$("selPrice").textContent=`₹${money(selected.ltp)}`;$("selChange").className=Number(selected.change)>=0?"up":"down";$("selChange").textContent=`${Number(selected.change)>=0?"+":""}₹${money(selected.change)} (${Number(selected.percent||0).toFixed(2)}%)`;
+const lo=Number(selected.low||selected.yearLow||0),hi=Number(selected.high||selected.yearHigh||0);
+$("selRange").textContent=(lo||hi)?`Range: ₹${money(lo)} – ₹${money(hi)}`:"Range: —";
+const vals=[["Open",selected.open],["High",selected.high],["Low",selected.low],["Volume",selected.volume?Number(selected.volume).toLocaleString("en-IN"):"—"],["Prev close",selected.cp],["52W high",selected.yearHigh||"—"],["52W low",selected.yearLow||"—"],["Tick time",selected.stale?"Last close":(selected.ltt?new Date(Number(selected.ltt)).toLocaleTimeString("en-IN"):"live")]];
+$("stats").innerHTML=vals.map(v=>`<div class="stat"><span class="muted">${v[0]}</span><b>${typeof v[1]==="number"&&v[1]!==0?money(v[1]):v[1]}</b></div>`).join("");
+["pe","roce","roc","pb","peg"].forEach(id=>$(id).textContent="—");}
+async function loadChartHistory(){
+  if(!selected)return;
+  $("info").textContent="Loading chart…";
+  try{
+    const isGlobal=selected.exchange==="GLOBAL"||selected.market==="GLOBAL"||selected.isGlobal;
+    const r=await fetch(`/api/history?symbol=${encodeURIComponent(selected.symbol)}&range=${currentRange}${isGlobal?"&global=1":""}`);
+    const j=await r.json();
+    if(j.ok&&j.points?.length){
+      chartPoints=j.points;
+      $("info").textContent=j.stale?"Showing last known chart (live history feed unavailable right now).":"Live/verified chart data.";
+    } else {
+      chartPoints=[];
+      $("info").textContent="No historical data available yet for this symbol/range.";
+    }
+  }catch{ chartPoints=[]; $("info").textContent="Chart feed unavailable right now."; }
+  drawChart();
+}
+function drawChart(){
+  const finite=chartPoints.map(p=>Number(p.c)).filter(Number.isFinite);
+  if(finite.length<2){$("line").setAttribute("points","");$("area").setAttribute("points","");return;}
+  const min=Math.min(...finite),max=Math.max(...finite),span=max-min||Math.max(Math.abs(min)*.001,1);
+  const p=finite.map((v,i)=>{const x=12+i*(776/(finite.length-1));const y=235-((v-min)/span)*215;return `${x.toFixed(1)},${y.toFixed(1)}`}).join(" ");
+  $("line").setAttribute("points",p);$("area").setAttribute("points",`12,235 ${p} 788,235`);
+}
+function setAlert(){if(!selected)return toast("Select a stock first");const p=Number(prompt(`Alert price for ${selected.symbol}`,money(selected.ltp)));if(!Number.isFinite(p)||p<=0)return;if(!alerts.some(a=>a.key===selected.key&&a.price===p)){alerts.push({key:selected.key,price:p});toast(`Alert set at ₹${money(p)}`)}}
+function checkAlerts(){for(const a of alerts){const q=market.stocks.find(x=>x.key===a.key);if(q&&((q.cp<=a.price&&q.ltp>=a.price)||(q.cp>=a.price&&q.ltp<=a.price))){toast(`🔔 ${q.symbol} reached ₹${money(a.price)}`);alerts=alerts.filter(x=>x!==a)}}}
+function openSheet(){if(!selected)return;$("sheetTitle").textContent=`${selected.symbol} · ${selected.name}`;$("sheetback").style.display="flex"}
+function closeSheet(){$("sheetback").style.display="none"}
+async function load(){try{const r=await fetch("/api/market");const j=await r.json();if(!j.ok)throw Error(j.error);const firstLoad=!market.stocks.length;market=j;selected=selected&&market.stocks.some(x=>x.key===selected.key)?market.stocks.find(x=>x.key===selected.key):market.stocks[0];window.selectedSymbol=selected?.symbol||null;$("status").textContent=j.degraded?"● Last known":"● Live";$("feed").textContent=j.degraded?"Market feed: showing last known prices":"Market feed: live";renderIndices();renderStocks($("search").value);renderSelected();if(firstLoad)loadChartHistory();renderPortfolio()}catch(e){$("status").textContent="● API error";$("feed").textContent="Market feed: unavailable";toast(e.message)}}
+$("voiceBtn").addEventListener("click",startVoice);$("stopVoice").addEventListener("click",stopVoice);$("voiceLang").addEventListener("change",()=>{if(voice){stopVoice();startVoice()}});
+$("alertBtn").addEventListener("click",setAlert);$("watchBtn").addEventListener("click",()=>{if(!selected)return;watchlist.has(selected.key)?(watchlist.delete(selected.key),toast("Removed from watchlist")):(watchlist.add(selected.key),toast("Added to watchlist"))});
+$("fundBtn").addEventListener("click",()=>{$("info").textContent="PE, ROCE, ROC, P/B and PEG are intentionally blank until a verified fundamentals data source is connected. This prevents inaccurate investment information.";toast("Verified fundamentals source required")});
+$("sheetAlert").addEventListener("click",()=>{setAlert();closeSheet()});$("sheetVoice").addEventListener("click",()=>{closeSheet();startVoice()});$("sheetFund").addEventListener("click",()=>{closeSheet();$("fundBtn").click()});$("sheetClose").addEventListener("click",closeSheet);$("sheetback").addEventListener("click",e=>{if(e.target===$("sheetback"))closeSheet()});
+let searchTimer=null;
+$("search").addEventListener("input",e=>{
+  const q=e.target.value.trim();
+  renderStocks(q);
+  clearTimeout(searchTimer);
+  if(q.length<2)return;
+  searchTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch("/api/search?q="+encodeURIComponent(q));
+      const d=await r.json();
+      if(!d.ok||!Array.isArray(d.data)||!d.data.length)return;
+      const extra=d.data.map(x=>{
+        const isGlobal=x.market==="GLOBAL";
+        const c=x.cached||{};
+        return {...x,ltp:Number(c.ltp||0),cp:Number(c.cp||0),change:Number(c.change||0),percent:Number(c.percent||0),
+          open:0,high:Number(c.yearHigh||0),low:Number(c.yearLow||0),volume:0,
+          isGlobal,exchange:isGlobal?"GLOBAL":x.exchange,icon:(x.symbol||"?").slice(0,2)};
+      });
+      const known=new Set(market.stocks.map(x=>x.symbol));
+      market.stocks=[...market.stocks,...extra.filter(x=>!known.has(x.symbol))];
+      renderStocks(q);
+    }catch{}
+  },350);
+});
+document.querySelectorAll("#ranges button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("#ranges button").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentRange=b.dataset.range;loadChartHistory()}));
+document.querySelectorAll("#portfolioRanges button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("#portfolioRanges button").forEach(x=>x.classList.remove("active"));b.classList.add("active");portfolioRange=b.dataset.range;renderPortfolio()}));
+function renderSection(section){
+  if(section==="Stocks"){ $("stocks").innerHTML=""; renderStocks($("search").value); return; }
+  if(section==="Indices"){ $("stocks").innerHTML='<div class="note">Indices are shown in the Market overview above.</div>'; return; }
+  if(section==="Watchlist"){
+    const rows=market.stocks.filter(x=>watchlist.has(x.key));
+    $("stocks").innerHTML=rows.length?rows.map(x=>`<div class="stock" data-key="${safe(x.key)}" data-symbol="${safe(x.symbol)}"><div class="icon">${safe(x.icon||x.symbol.slice(0,2))}</div><div><div class="title">${safe(x.symbol)}</div><div class="muted">${safe(x.name)}</div></div><div class="metrics"><div class="title">₹${money(x.ltp)}</div></div></div>`).join(""):"<div class='note'>No watchlist stocks yet.</div>";
+    document.querySelectorAll(".stock").forEach(el=>el.addEventListener("click",()=>{selected=market.stocks.find(x=>x.key===el.dataset.key);window.selectedSymbol=selected?.symbol||null;renderSelected();renderStocks("");}));
+    return;
+  }
+  const labels={
+    "IPO":"IPO feed is not configured yet. Connect a verified IPO provider to show live IPO data.",
+    "Mutual Funds":"Mutual-fund NAV feed is not configured yet. No fake values are shown.",
+    "Gold":"Gold feed is not configured yet. Connect a verified bullion provider to show live prices."
+  };
+  $("stocks").innerHTML=`<div class="note">${labels[section]||"Select a section."}</div>`;
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  renderSection(b.dataset.section);
+}));
+const es=new EventSource("/api/stream");es.onopen=()=>{$("status").textContent="● Live";$("feed").textContent="Market feed: live stream"};es.onerror=()=>{$("status").textContent="● Reconnecting";$("feed").textContent="Market feed: reconnecting"};es.onmessage=e=>{try{const t=JSON.parse(e.data);if(t.type!=="tick")return;const q=market.stocks.find(x=>x.key===t.key)||market.indices.find(x=>x.key===t.key);if(!q)return;q.ltp=Number(t.ltp);q.cp=Number(t.cp||q.cp||0);q.change=q.cp?q.ltp-q.cp:0;q.percent=q.cp?(q.change/q.cp)*100:0;q.ltt=t.ltt;q.updatedAt=Date.now();if(selected?.key===q.key)renderSelected();renderStocks($("search").value);renderIndices();checkAlerts();if(voice) speakCurrent()}catch{}};
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+setInterval(updateClock,250);updateClock();load();setInterval(load,30000);
+function renderGlobal(items,note,degraded){
+  $("globalIndices").innerHTML=items.map(x=>`<div class="card"><div class="title">${safe(x.name)}</div><div class="muted">${x.stale?"Last known":(x.marketState||"—")}</div><div class="price">${x.ltp?money(x.ltp):"—"}</div><div class="${Number(x.change)>=0?"up":"down"}">${Number(x.change)>=0?"+":""}${money(x.change)} (${Number(x.percent||0).toFixed(2)}%)</div></div>`).join("");
+  $("globalNote").textContent=(degraded?"⚠ ":"")+ (note||"");
+}
+async function loadGlobal(){
+  try{const r=await fetch("/api/global");const j=await r.json();if(j.ok) renderGlobal(j.data,j.note,j.degraded)}catch(e){}
+}
+loadGlobal();setInterval(loadGlobal,60000);
+function renderGlobalStocks(items){
+  lastGlobalStocksData=items;
+  $("globalStocks").innerHTML=items.map(x=>`<div class="card" data-gsym="${safe(x.symbol)}" style="cursor:pointer"><div class="title">${safe(x.name)}</div><div class="muted">${x.stale?"Last known":(x.marketState||"—")}</div><div class="price">${x.ltp?money(x.ltp):"—"} ${safe(x.currency||"")}</div><div class="${Number(x.change)>=0?"up":"down"}">${Number(x.change)>=0?"+":""}${money(x.change)} (${Number(x.percent||0).toFixed(2)}%)</div></div>`).join("");
+  document.querySelectorAll("[data-gsym]").forEach(el=>el.addEventListener("click",()=>{
+    const g=lastGlobalStocksData.find(x=>x.symbol===el.dataset.gsym); if(!g) return;
+    selected={...g,exchange:"GLOBAL",market:"GLOBAL",isGlobal:true,open:0,low:g.ltp*0.98,high:g.ltp*1.02,volume:g.volume||0};
+    window.selectedSymbol=selected.symbol;
+    renderSelected(); loadChartHistory();
+    document.querySelector(".chartpanel")?.scrollIntoView({behavior:"smooth"});
+  }));
+}
+async function loadGlobalStocks(){try{const r=await fetch("/api/global-stocks");const j=await r.json();if(j.ok)renderGlobalStocks(j.data)}catch(e){}}
+loadGlobalStocks();setInterval(loadGlobalStocks,15000);
+
+
+// ── Dillu Smart Voice Assistant: EN + HI + TE ─────────────────
+const smartPanel=document.getElementById("voiceCommandPanel");
+const smartBtn=document.getElementById("smartVoiceBtn")||document.getElementById("micBtn");
+const closeSmart=document.getElementById("closeVoicePanel")||document.getElementById("closeCommand");
+const listenSmart=document.getElementById("listenVoiceCommand")||document.getElementById("listenCommand");
+const smartStatus=document.getElementById("voiceCommandStatus")||document.getElementById("commandStatus");
+const orderPreview=document.getElementById("orderPreview");
+
+function openSmartVoice(){ smartPanel?.classList.remove("hidden"); }
+function closeSmartVoice(){ smartPanel?.classList.add("hidden"); }
+smartBtn?.addEventListener("click",openSmartVoice);
+closeSmart?.addEventListener("click",closeSmartVoice);
+
+const DILLU_ALIASES={
+  reliance:["reliance","ril","రిలయన్స్","रिलायंस"],
+  tcs:["tcs","టీసీఎస్","टीसीएस"],
+  infosys:["infosys","infy","ఇన్ఫోసిస్","इन्फोसिस"],
+  hdfcbank:["hdfc bank","hdfcbank","హెచ్‌డీఎఫ్‌సీ బ్యాంక్","एचडीएफसी बैंक"],
+  icicibank:["icici bank","icicibank","ఐసీఐసీఐ బ్యాంక్","आईसीआईसीआई बैंक"],
+  sbin:["sbi","sbin","ఎస్‌బీఐ","एसबीआई"],
+  tatamotors:["tata motors","tatamotors","టాటా మోటార్స్","टाटा मोटर्स"],
+  bhartiartl:["airtel","bharti airtel","భారతి ఎయిర్‌టెల్","भारती एयरटेल"]
+};
+const SYMBOL_MAP={reliance:"RELIANCE",tcs:"TCS",infosys:"INFY",hdfcbank:"HDFCBANK",icicibank:"ICICIBANK",sbin:"SBIN",tatamotors:"TATAMOTORS",bhartiartl:"BHARTIARTL"};
+
+function commandLang(){
+  const v=document.getElementById("voiceLang")?.value||"en-IN";
+  return v.startsWith("te")?"te":v.startsWith("hi")?"hi":"en";
+}
+function normalizeVoice(s){
+  return s.toLowerCase().replace(/[.,!?;:।]/g," ").replace(/\s+/g," ").trim()
+    .replace(/^(hey\s+dillu|dillu|హే\s*దిల్లు|హే\s*దిల్లు|दिल्लू)\s*/,"").trim();
+}
+function findVoiceSymbol(text){
+  const s=text.toLowerCase();
+  for(const key of Object.keys(DILLU_ALIASES)){
+    if(DILLU_ALIASES[key].some(a=>s.includes(a.toLowerCase()))) return SYMBOL_MAP[key];
+  }
+  return window.selectedSymbol || null;
+}
+function numberFromVoice(s){
+  const m=s.match(/(?:₹|rs\.?|rupees?|రూపాయలు|रुपये)?\s*([0-9]+(?:\.[0-9]+)?)/i);
+  return m?Number(m[1]):null;
+}
+function quantityFromVoice(s){
+  const m=s.match(/(?:buy|sell|కొను|కొనండి|అమ్ము|అమ్మండి|खरीद|बेच|shares?|షేర్లు|शेयर)\s*(?:me\s*)?([0-9]+)/i);
+  return m?parseInt(m[1],10):null;
+}
+function speakDillu(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=document.getElementById("voiceLang")?.value||"en-IN";
+  const v=window.findVoice?.(u.lang); if(v) u.voice=v;
+  u.rate=.92; speechSynthesis.speak(u);
+}
+function localized(kind, symbol, extra=""){
+  const lang=commandLang();
+  if(lang==="te"){
+    const t={
+      price:`${symbol} ప్రస్తుత ధర ${extra} రూపాయలు.`,
+      buy:`${symbol} కోసం ${extra} కొనుగోలు ఆర్డర్ సిద్ధం చేస్తున్నాను. ముందుగా నిర్ధారించండి.`,
+      sell:`${symbol} కోసం ${extra} అమ్మకపు ఆర్డర్ సిద్ధం చేస్తున్నాను. ముందుగా నిర్ధారించండి.`,
+      explain:`${symbol} గురించి అందుబాటులో ఉన్న మార్కెట్ డేటాను చెబుతున్నాను.`,
+      future:`${symbol} భవిష్యత్ గురించి ఖచ్చితమైన హామీ ఇవ్వలేను. ప్రస్తుత ట్రెండ్, 52 వారాల స్థాయి మరియు వాల్యూమ్ ఆధారంగా outlook చెబుతున్నాను.`,
+      unknown:`క్షమించండి Dillu, ఆ command అర్థం కాలేదు.`
+    }; return t[kind]||t.unknown;
+  }
+  if(lang==="hi"){
+    const t={
+      price:`${symbol} की मौजूदा कीमत ${extra} रुपये है।`,
+      buy:`${symbol} के लिए ${extra} खरीद आदेश तैयार है। पहले पुष्टि करें।`,
+      sell:`${symbol} के लिए ${extra} बेचने का आदेश तैयार है। पहले पुष्टि करें।`,
+      explain:`${symbol} के बारे में उपलब्ध मार्केट डेटा बता रहा हूँ।`,
+      future:`${symbol} के भविष्य की गारंटी नहीं दी जा सकती। मौजूदा ट्रेंड, 52 हफ्ते के स्तर और वॉल्यूम के आधार पर outlook बता रहा हूँ।`,
+      unknown:`माफ़ कीजिए Dillu, command समझ नहीं आया।`
+    }; return t[kind]||t.unknown;
+  }
+  const t={
+    price:`${symbol} current price is ${extra} rupees.`,
+    buy:`Buy order for ${extra} ${symbol} is ready. Please confirm before execution.`,
+    sell:`Sell order for ${extra} ${symbol} is ready. Please confirm before execution.`,
+    explain:`Here is the available market information for ${symbol}.`,
+    future:`I cannot guarantee the future of ${symbol}. I will give a data-based outlook using trend, 52-week levels and volume.`,
+    unknown:`Sorry Dillu, I didn't understand that command.`
+  }; return t[kind]||t.unknown;
+}
+async function previewOrder(symbol,side,qty){
+  if(!qty || qty<1){ smartStatus.textContent=commandLang()==="te"?"ఎన్ని shares చెప్పండి.":commandLang()==="hi"?"कितने shares बताइए।":"Please specify the quantity."; return; }
+  try{
+    const r=await fetch("/api/order/preview",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symbol,transaction_type:side,quantity:qty})});
+    const d=await r.json(); if(!r.ok) throw new Error(d.error||"Preview failed");
+    const ltp=Number(d.ltp||0).toFixed(2);
+    smartStatus.textContent=localized(side==="BUY"?"buy":"sell",symbol,qty);
+    orderPreview.classList.remove("hidden");
+    orderPreview.innerHTML=`<div class="order-title">${side==="BUY"?"🟢":"🔴"} ${side} ${qty} × ${symbol}</div>
+      <div class="order-meta">LTP ₹${ltp} • MARKET • Delivery</div>
+      <div class="confirm"><button class="primary" id="confirmOrder">Confirm</button><button class="secondary" id="cancelOrder">Cancel</button></div>`;
+    // Safety: voice commands never silently submit a financial order.
+    document.getElementById("confirmOrder").onclick=()=>{
+      smartStatus.textContent="Order execution is intentionally disabled in this build. Confirmed draft only.";
+      speakDillu(commandLang()==="te"?"ఆర్డర్ డ్రాఫ్ట్ confirm అయింది. ఈ build లో order execute చేయడం ఇంకా disabled.":commandLang()==="hi"?"ऑर्डर ड्राफ्ट confirm हुआ। इस build में order execution अभी disabled है।":"Order draft confirmed. Live order execution is disabled in this build.");
+    };
+    document.getElementById("cancelOrder").onclick=()=>{orderPreview.classList.add("hidden");};
+  }catch(e){ smartStatus.textContent=e.message; }
+}
+function stockRow(symbol){
+  const wanted=String(symbol||"").toUpperCase();
+  return [...document.querySelectorAll("[data-symbol]")].find(x=>String(x.dataset.symbol||"").toUpperCase()===wanted);
+}
+
+async function getFundamentals(symbol){
+  const r=await fetch(`/api/fundamentals?symbol=${encodeURIComponent(symbol)}`);
+  const d=await r.json(); if(!r.ok||!d.ok) throw new Error(d.error||"Fundamentals unavailable");
+  return d;
+}
+function speakSequence(lines,gap=1600){ lines.forEach((line,i)=>setTimeout(()=>speakDillu(line),i*gap)); }
+function speakFullSummary(symbol){
+  const q=market.stocks.find(x=>x.symbol===symbol);
+  if(!q){ speakDillu(localized("unknown")); return; }
+  stockRow(symbol)?.click();
+  const lang=commandLang(), up=Number(q.change)>=0;
+  const dir=lang==="te"?(up?"లాభం":"నష్టం"):lang==="hi"?(up?"बढ़त":"गिरावट"):(up?"gain":"loss");
+  const lines = lang==="te" ? [
+    `${symbol} ప్రస్తుత ధర ${money(q.ltp)} రూపాయలు.`,
+    `నిన్నటి ముగింపు ధర ${money(q.cp)} రూపాయలు.`,
+    `ఈరోజు ${dir} ${money(Math.abs(q.change))} రూపాయలు, అంటే ${Math.abs(q.percent).toFixed(2)} శాతం.`,
+    `ఈరోజు గరిష్ట ధర ${money(q.high)}, కనిష్ట ధర ${money(q.low)} రూపాయలు.`
+  ] : lang==="hi" ? [
+    `${symbol} की मौजूदा कीमत ${money(q.ltp)} रुपये है।`,
+    `पिछली बंद कीमत ${money(q.cp)} रुपये थी।`,
+    `आज ${dir} ${money(Math.abs(q.change))} रुपये है, यानी ${Math.abs(q.percent).toFixed(2)} प्रतिशत।`,
+    `आज का उच्चतम ${money(q.high)}, न्यूनतम ${money(q.low)} रुपये है।`
+  ] : [
+    `${symbol}'s current price is ${money(q.ltp)} rupees.`,
+    `Yesterday's closing price was ${money(q.cp)} rupees.`,
+    `Today's ${dir} is ${money(Math.abs(q.change))} rupees, that is ${Math.abs(q.percent).toFixed(2)} percent.`,
+    `Today's high is ${money(q.high)} and low is ${money(q.low)} rupees.`
+  ];
+  speakSequence(lines,1900);
+}
+function metricText(metric,value,sector){
+  const l=commandLang();
+  if(value==null||value===""){
+    return l==="te"?`${metric} data అందుబాటులో లేదు.`:l==="hi"?`${metric} का data उपलब्ध नहीं है।`:`${metric} data is not available.`;
+  }
+  return l==="te"?`${metric} విలువ ${value}${sector?`, sector ${sector}`:""}.`:
+         l==="hi"?`${metric} की value ${value}${sector?`, sector ${sector}`:""}.`:
+         `${metric} is ${value}${sector?`, sector ${sector}`:""}.`;
+}
+async function speakOneMetric(symbol,metric){
+  const d=await getFundamentals(symbol);
+  const map={PE:"pe","P/E":"pe",ROCE:"roce",ROC:"roc","P/B":"pb",PB:"pb",PEG:"peg",ROE:"roe",ROA:"roa","EV/EBITDA":"evEbitda"};
+  const v=d.ratios?.[map[metric.toUpperCase()]||metric.toLowerCase()];
+  speakDillu(metricText(metric,v?.company||null,v?.sector||null));
+}
+async function speakAllFundamentals(symbol){
+  try{
+    const d=await getFundamentals(symbol), r=d.ratios||{}, l=commandLang();
+    const lines=[
+      metricText("P E",r.pe?.company,r.pe?.sector),
+      metricText("ROCE",r.roce?.company,r.roce?.sector),
+      metricText("ROC",r.roc?.company,null),
+      metricText("P B",r.pb?.company,r.pb?.sector),
+      metricText("PEG",r.peg?.company,null),
+      metricText("ROE",r.roe?.company,r.roe?.sector),
+      metricText("ROA",r.roa?.company,r.roa?.sector),
+      metricText("EV EBITDA",r.evEbitda?.company,r.evEbitda?.sector)
+    ];
+    if(r.epsGrowth) lines.push(l==="te"?`EPS growth ${r.epsGrowth}.`:l==="hi"?`EPS growth ${r.epsGrowth} है।`:`EPS growth is ${r.epsGrowth}.`);
+    speakSequence(lines,1600);
+    smartStatus.textContent=l==="te"?"Fundamentals ఒక్కొక్కటిగా చెబుతున్నాను.":l==="hi"?"Fundamentals एक-एक करके बता रहा हूँ।":"Speaking fundamentals one by one.";
+  }catch(e){smartStatus.textContent=e.message;speakDillu(e.message);}
+}
+
+async function runSmartCommand(raw){
+  const s=normalizeVoice(raw);
+  const symbol=findVoiceSymbol(s);
+  if(/\b(stop|pause)\b.*\bvoice\b|వాయిస్.*ఆపు|आवाज़.*बंद/.test(s)){ window.stopVoice?.(); speakDillu(commandLang()==="te"?"వాయిస్ ఆపేశాను.":commandLang()==="hi"?"आवाज़ बंद कर दी।":"Voice updates stopped."); return; }
+  if(/\b(start|play|resume)\b.*\bvoice\b|వాయిస్.*ప్రారంభ|आवाज़.*शुरू/.test(s)){ window.startVoice?.(); return; }
+  if(/\b(buy|కొను|కొనండి|खरीद)\b/.test(s) && symbol){ return previewOrder(symbol,"BUY",quantityFromVoice(s)); }
+  if(/\b(sell|అమ్ము|అమ్మండి|बेच)\b/.test(s) && symbol){ return previewOrder(symbol,"SELL",quantityFromVoice(s)); }
+  if(/\b(alert|notify|remind|అలర్ట్|గుర్తు|अलर्ट|सूचित)\b/.test(s) && symbol){
+    const p=numberFromVoice(s); if(p&&typeof window.addPriceAlert==="function"){ window.addPriceAlert(symbol,p); speakDillu(commandLang()==="te"?`${symbol} కి ${p} రూపాయల alert పెట్టాను.`:commandLang()==="hi"?`${symbol} के लिए ${p} रुपये का alert लगा दिया।`:`Alert set for ${symbol} at ${p} rupees.`); return; }
+  }
+  if(/\b(watchlist|watch|add|జాబితా|వాచ్|watchlist లో|watchlist me|सूची)\b/.test(s) && symbol){
+    const wq=market.stocks.find(x=>x.symbol===symbol);
+    if(wq){ watchlist.has(wq.key)?watchlist.delete(wq.key):watchlist.add(wq.key); }
+    speakDillu(commandLang()==="te"?`${symbol} watchlist లో add చేశాను.`:commandLang()==="hi"?`${symbol} को watchlist में जोड़ दिया।`:`Added ${symbol} to your watchlist.`); return;
+  }
+  if(/\b(future|outlook|growth|భవిష్యత్|future ఎలా|ముందు|भविष्य|आगे|growth)\b/.test(s) && symbol){
+    speakDillu(localized("future",symbol)); return;
+  }
+  if(/\b(all\s*(fundamentals|ratios|information)|fundamentals|ratios)\b/.test(s) ||
+     /(?:అన్ని|ఫండమెంటల్స్|విలువలు)/.test(s) ||
+     /(?:सभी|फंडामेंटल|सभी ratios)/.test(s)){
+    if(!symbol){ smartStatus.textContent="Please say the stock name."; return; }
+    await speakAllFundamentals(symbol); return;
+  }
+  if(/\b(pe|p\/e|roce|roc|p\/b|pb|peg|roe|roa|ev\/ebitda)\b/.test(s)){
+    if(!symbol){ smartStatus.textContent="Please say the stock name."; return; }
+    const m=s.match(/\b(pe|p\/e|roce|roc|p\/b|pb|peg|roe|roa|ev\/ebitda)\b/);
+    await speakOneMetric(symbol,m[1].toUpperCase()); return;
+  }
+  if(/\b(old|previous|yesterday|prev|last)\b.*\b(price|close|rate|value)\b|పాత\s*ధర|నిన్నటి\s*ధర|క్లోజింగ్\s*ధర|मुझे\s*पुरानी|पुरानी\s*कीमत|पिछला\s*बंद|पिछली\s*कीमत|कल\s*की\s*कीमत/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const cp=money(q.cp), lang=commandLang();
+    speakDillu(lang==="te"?`${symbol} నిన్నటి ముగింపు ధర ${cp} రూపాయలు.`:lang==="hi"?`${symbol} की पिछली बंद कीमत ${cp} रुपये थी।`:`${symbol}'s previous closing price was ${cp} rupees.`);
+    return;
+  }
+  if(/\b(change|up or down|gain|loss|how much)\b|ఎంత\s*పెరిగింది|ఎంత\s*తగ్గింది|कितना\s*बढ़ा|कितना\s*घटा/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang(), up=Number(q.change)>=0;
+    const dir=lang==="te"?(up?"పెరిగింది":"తగ్గింది"):lang==="hi"?(up?"बढ़ी है":"घटी है"):(up?"is up":"is down");
+    speakDillu(lang==="te"?`${symbol} ధర ${money(Math.abs(q.change))} రూపాయలు ${dir}, అంటే ${Math.abs(q.percent).toFixed(2)} శాతం.`:lang==="hi"?`${symbol} की कीमत ${money(Math.abs(q.change))} रुपये ${dir}, यानी ${Math.abs(q.percent).toFixed(2)} प्रतिशत।`:`${symbol} ${dir} by ${money(Math.abs(q.change))} rupees, that is ${Math.abs(q.percent).toFixed(2)} percent.`);
+    return;
+  }
+  if(/\bopening\s*price\b|\bday'?s?\s*open\b|ఓపెనింగ్\s*ధర|खुलने\s*की\s*कीमत/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang();
+    speakDillu(lang==="te"?`${symbol} ఈరోజు ఓపెనింగ్ ధర ${money(q.open)} రూపాయలు.`:lang==="hi"?`${symbol} की आज की खुलने की कीमत ${money(q.open)} रुपये है।`:`${symbol}'s opening price today was ${money(q.open)} rupees.`);
+    return;
+  }
+  if(/\bday'?s?\s*high\b|\bhigh\s*price\b|రోజు\s*గరిష్ట|दिन\s*का\s*उच्चतम/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang();
+    speakDillu(lang==="te"?`${symbol} ఈరోజు గరిష్ట ధర ${money(q.high)} రూపాయలు.`:lang==="hi"?`${symbol} का आज का उच्चतम भाव ${money(q.high)} रुपये है।`:`${symbol}'s day high today is ${money(q.high)} rupees.`);
+    return;
+  }
+  if(/\bday'?s?\s*low\b|\blow\s*price\b|రోజు\s*కనిష్ట|दिन\s*का\s*न्यूनतम/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang();
+    speakDillu(lang==="te"?`${symbol} ఈరోజు కనిష్ట ధర ${money(q.low)} రూపాయలు.`:lang==="hi"?`${symbol} का आज का न्यूनतम भाव ${money(q.low)} रुपये है।`:`${symbol}'s day low today is ${money(q.low)} rupees.`);
+    return;
+  }
+  if(/\b(52\s*week\s*high|year\s*high)\b|52\s*వారాల\s*గరిష్ట|52\s*हफ्ते\s*का\s*उच्चतम/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang(), v=q.yearHigh?money(q.yearHigh):(lang==="te"?"అందుబాటులో లేదు":lang==="hi"?"उपलब्ध नहीं":"not available");
+    speakDillu(lang==="te"?`${symbol} 52 వారాల గరిష్ట ధర ${v} రూపాయలు.`:lang==="hi"?`${symbol} का 52 हफ्ते का उच्चतम भाव ${v} रुपये है।`:`${symbol}'s 52-week high is ${v} rupees.`);
+    return;
+  }
+  if(/\b(52\s*week\s*low|year\s*low)\b|52\s*వారాల\s*కనిష్ట|52\s*हफ्ते\s*का\s*न्यूनतम/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang(), v=q.yearLow?money(q.yearLow):(lang==="te"?"అందుబాటులో లేదు":lang==="hi"?"उपलब्ध नहीं":"not available");
+    speakDillu(lang==="te"?`${symbol} 52 వారాల కనిష్ట ధర ${v} రూపాయలు.`:lang==="hi"?`${symbol} का 52 हफ्ते का न्यूनतम भाव ${v} रुपये है।`:`${symbol}'s 52-week low is ${v} rupees.`);
+    return;
+  }
+  if(/\bvolume\b|వాల్యూమ్|वॉल्यूम/.test(s) && symbol){
+    const q=market.stocks.find(x=>x.symbol===symbol); stockRow(symbol)?.click();
+    if(!q){ speakDillu(localized("unknown")); return; }
+    const lang=commandLang(), v=q.volume?Number(q.volume).toLocaleString("en-IN"):(lang==="te"?"అందుబాటులో లేదు":lang==="hi"?"उपलब्ध नहीं":"not available");
+    speakDillu(lang==="te"?`${symbol} వాల్యూమ్ ${v}.`:lang==="hi"?`${symbol} का वॉल्यूम ${v} है।`:`${symbol}'s volume is ${v}.`);
+    return;
+  }
+  if(/\b(everything|full details|complete details|summary|full summary)\b|అన్ని\s*వివరాలు|పూర్తి\s*వివరాలు|पूरी\s*जानकारी|सारी\s*जानकारी/.test(s) && symbol){
+    return speakFullSummary(symbol);
+  }
+  if(/\b(open|show|select|display)\b/.test(s) && symbol || /(?:చూపించు|తెరువు|ఓపెన్|दिखाओ|खोलो|ओपन)/.test(s) && symbol){
+    stockRow(symbol)?.click();
+    speakDillu(commandLang()==="te"?`${symbol} stock open చేశాను.`:commandLang()==="hi"?`${symbol} stock खोल दिया।`:`Opened ${symbol}.`);
+    return;
+  }
+  if(/\b(price|rate|quote|ltp|ధర|రేట్|कीमत|भाव)\b/.test(s) && symbol){
+    stockRow(symbol)?.click();
+    const pq=market.stocks.find(x=>x.symbol===symbol);
+    const price=pq?money(pq.ltp):"";
+    speakDillu(localized("price",symbol,price)); return;
+  }
+  if(/\b(about|explain|fundamental|fundamentals|చెప్పు|గురించి|వివరాలు|बता|बताओ|जानकारी)\b/.test(s) && symbol){
+    document.getElementById("fundamentals")?.scrollIntoView({behavior:"smooth"});
+    return speakFullSummary(symbol);
+  }
+  speakDillu(localized("unknown"));
+}
+function startSmartListening(){
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!R){ smartStatus.textContent="Speech recognition is not supported. Use Chrome on Android."; return; }
+  const r=new R(); r.lang=document.getElementById("voiceLang")?.value||"en-IN"; r.continuous=false; r.interimResults=false;
+  smartStatus.textContent="🎤 Listening…";
+  r.onresult=e=>{const t=e.results[0][0].transcript; smartStatus.textContent=`Heard: “${t}”`; runSmartCommand(t);};
+  r.onerror=e=>smartStatus.textContent=`Voice error: ${e.error}`;
+  r.start();
+}
+listenSmart?.addEventListener("click",startSmartListening);
+window.runSmartCommand=runSmartCommand;
+document.getElementById("micBtn")?.addEventListener("click",()=>{ openSmartVoice(); startSmartListening(); });
+
+
+function money2(v){return Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+// ---- Portfolio: real holdings stored on-device, real prices, real history ----
+let portfolioRange="1D";
+function loadHoldings(){ try{return JSON.parse(localStorage.getItem("tv_holdings")||"[]")}catch{return []} }
+function saveHoldings(h){ localStorage.setItem("tv_holdings",JSON.stringify(h)); }
+function populateHoldSymbolOptions(){
+  const sel=$("holdSymbol");if(!sel)return;
+  const nse=(market.stocks&&market.stocks.length?market.stocks:STOCK_DEFAULTS).map(x=>({symbol:x.symbol,name:x.name,global:false}));
+  const glo=GLOBAL_STOCK_LIST.map(x=>({symbol:x.symbol,name:x.name,global:true}));
+  sel.innerHTML=[...nse,...glo].map(x=>`<option value="${safe(x.symbol)}" data-global="${x.global?1:0}">${safe(x.symbol)} — ${safe(x.name)}</option>`).join("");
+}
+function priceFor(symbol,isGlobal){
+  if(isGlobal){ const c=lastGlobalStocksData.find(g=>g.symbol===symbol); return c?Number(c.ltp||0):0; }
+  const s=market.stocks.find(x=>x.symbol===symbol); return s?Number(s.ltp||0):0;
+}
+function renderPortfolio(){
+  const panel=document.getElementById("portfolioPanel");
+  if(!panel)return;
+  populateHoldSymbolOptions();
+  const holdings=loadHoldings();
+  let invested=0,current=0;
+  holdings.forEach(h=>{ h.ltp=priceFor(h.symbol,h.global); invested+=Number(h.avg)*Number(h.qty); current+=h.ltp*Number(h.qty); });
+  const pnl=current-invested;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent="₹"+money2(v)};
+  set("portfolioInvested",invested);set("portfolioCurrent",current);set("portfolioPnl",pnl);
+  const pnlEl=document.getElementById("portfolioPnl");if(pnlEl)pnlEl.style.color=pnl>=0?"#16803c":"#c62828";
+  const list=document.getElementById("portfolioHoldings");
+  if(list)list.innerHTML=holdings.length?holdings.map((h,i)=>{
+    const qty=Number(h.qty),price=Number(h.ltp),avg=Number(h.avg);
+    return `<div class="holding"><div><strong>${safe(h.symbol)}</strong>${h.global?' <span class="muted">(foreign)</span>':''}<div class="muted">${qty} qty · Avg ₹${money2(avg)}</div></div><div>₹${money2(price*qty)}</div><div style="color:${price>=avg?'#16803c':'#c62828'}">${price>=avg?'+':'−'}₹${money2(Math.abs((price-avg)*qty))} <a href="#" data-i="${i}" class="rmHold" style="margin-left:8px;color:#999">✕</a></div></div>`;
+  }).join(""):"<div class='note'>No holdings yet. Add one below.</div>";
+  document.querySelectorAll(".rmHold").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();const h=loadHoldings();h.splice(Number(a.dataset.i),1);saveHoldings(h);renderPortfolio();}));
+  if(panel.style.display!=="none") drawPortfolioChartReal(holdings);
+}
+$("holdAdd")?.addEventListener("click",()=>{
+  const sel=$("holdSymbol"),qty=Number($("holdQty").value),avg=Number($("holdAvg").value);
+  if(!sel.value||!qty||!avg)return toast("Enter symbol, qty and avg price");
+  const isGlobal=sel.selectedOptions[0].dataset.global==="1";
+  const h=loadHoldings(); h.push({symbol:sel.value,qty,avg,global:isGlobal}); saveHoldings(h);
+  $("holdQty").value="";$("holdAvg").value="";
+  renderPortfolio();
+});
+// Real portfolio value history: sum each holding's qty × historical close, aligned by index.
+async function drawPortfolioChartReal(holdings){
+  const c=document.getElementById("portfolioChart");if(!c)return;
+  const ctx=c.getContext("2d"),w=c.width=c.clientWidth*2,h=c.height=360;
+  ctx.clearRect(0,0,w,h);
+  if(!holdings.length) return;
+  let series=[];
+  try{
+    const histories=await Promise.all(holdings.map(async hd=>{
+      const r=await fetch(`/api/history?symbol=${encodeURIComponent(hd.symbol)}&range=${portfolioRange}${hd.global?"&global=1":""}`);
+      const j=await r.json();
+      return {qty:Number(hd.qty), points:(j.ok&&j.points)?j.points:[]};
+    }));
+    const maxLen=Math.max(0,...histories.map(x=>x.points.length));
+    if(maxLen<2) throw new Error("no history");
+    for(let i=0;i<maxLen;i++){
+      let total=0;
+      for(const hh of histories){
+        const idx=Math.min(i,hh.points.length-1);
+        if(hh.points[idx]) total+=hh.qty*Number(hh.points[idx].c);
+      }
+      series.push(total);
+    }
+  }catch{ series=[]; }
+  if(series.length<2){
+    ctx.fillStyle="#9aa0a6";ctx.font="24px sans-serif";ctx.fillText("No historical data available yet",20,h/2);
+    return;
+  }
+  const max=Math.max(...series),min=Math.min(...series),pad=28;
+  ctx.strokeStyle="#9aa0a6";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke();
+  ctx.strokeStyle="#2563eb";ctx.lineWidth=4;ctx.beginPath();
+  series.forEach((v,i)=>{ const x=pad+i*(w-2*pad)/(series.length-1); const y=h-pad-(v-min)/((max-min)||1)*(h-2*pad); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y); });
+  ctx.stroke();
+}
+
+// ---- Section navigation (Home / Watchlist / Portfolio / News / Orders / Profile) ----
+function showSection(name){
+  document.querySelectorAll(".app-section").forEach(s=>s.style.display="none");
+  if(name==="Portfolio"){ $("portfolioPanel").style.display=""; renderPortfolio(); }
+  else if(name==="News"){ $("newsPanel").style.display=""; loadNews(); }
+  else if(name==="Orders"){ $("ordersPanel").style.display=""; }
+  else if(name==="Profile"){ $("profilePanel").style.display=""; }
+  else { $("homeSection").style.display=""; if(name==="Watchlist"){ const tab=document.querySelector('[data-section="Watchlist"].tab'); if(tab) tab.click(); } else { const tab=document.querySelector('[data-section="Stocks"].tab'); if(tab) tab.click(); } }
+}
+document.querySelectorAll('.nav button[data-section]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b===btn));
+    showSection(btn.dataset.section);
+  });
+});
+
+// ---- News: live headlines + multi-language voice ----
+let newsAuto=false, newsAutoTimer=null, lastAnnouncedCrisis=new Set();
+function newsIcon(tag){return {war:"🪖",disaster:"🌊",crash:"📉",gold:"🥇",currency:"💵"}[tag]||"📰";}
+async function loadNews(){
+  try{
+    const r=await fetch("/api/news"); const j=await r.json();
+    const list=$("newsList"); if(!list) return;
+    if(!j.items?.length){ list.innerHTML="<div class='note'>No news available right now.</div>"; return; }
+    list.innerHTML=j.items.map(it=>`<div class="news-item ${it.tag!=='market'?'crisis':''}"><div class="news-tag">${newsIcon(it.tag)}</div><div><div class="news-title">${safe(it.title)}</div><div class="news-meta">${safe(it.source||'')} ${it.pubDate?'· '+new Date(it.pubDate).toLocaleString('en-IN'):''}</div></div></div>`).join("");
+    if(newsAuto){
+      for(const it of j.items){
+        const key=it.title;
+        if(it.tag!=="market" && !lastAnnouncedCrisis.has(key)){ lastAnnouncedCrisis.add(key); speakNewsText(it.title); break; }
+      }
+    }
+  }catch{}
+}
+async function speakNewsText(text){
+  const lang=$("newsVoiceLang")?.value||"en";
+  try{
+    const r=await fetch(`/api/translate?text=${encodeURIComponent(text)}&target=${lang}`);
+    const j=await r.json();
+    const finalText=j.ok?j.translatedText:text;
+    if(!("speechSynthesis"in window))return;
+    const u=new SpeechSynthesisUtterance(finalText);
+    u.lang=lang==="en"?"en-IN":`${lang}-IN`; u.rate=.85;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch{}
+}
+$("newsRefresh")?.addEventListener("click",loadNews);
+$("newsSpeakBtn")?.addEventListener("click",async()=>{
+  const lang=$("newsVoiceLang")?.value||"en";
+  try{
+    const r=await fetch(`/api/news/speak?lang=${lang}`); const j=await r.json();
+    if(j.text) speakNewsText(j.text); else toast("No headlines to read yet");
+  }catch{ toast("News voice unavailable right now"); }
+});
+$("newsAutoBtn")?.addEventListener("click",()=>{
+  newsAuto=!newsAuto; $("newsAutoBtn").textContent="Auto-read: "+(newsAuto?"On":"Off");
+  clearInterval(newsAutoTimer);
+  if(newsAuto){ newsAutoTimer=setInterval(loadNews,60000); toast("Will speak new war/crash/flood headlines automatically"); }
+});
+setInterval(()=>{ if($("newsPanel").style.display!=="none") loadNews(); },90000);
+</script>
+
+
+<div id="commandModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow">TRADEVOICE ASSISTANT</div>
+        <h3>Hey Dillu — Voice Commands</h3>
+        <p class="muted">Say a command after tapping the microphone.</p>
+      </div>
+      <button class="icon-btn" id="closeCommand">✕</button>
+    </div>
+    <div class="command-list">
+      <div><b>“Hey Dillu, Reliance price”</b><span>Shows and speaks Reliance price</span></div>
+      <div><b>“Hey Dillu, search TCS”</b><span>Searches/selects a stock</span></div>
+      <div><b>“Hey Dillu, add Infosys to watchlist”</b><span>Adds the stock to watchlist</span></div>
+      <div><b>“Hey Dillu, alert Reliance at 3000”</b><span>Creates a price alert</span></div>
+      <div><b>“Hey Dillu, start voice”</b><span>Starts spoken market updates</span></div>
+      <div><b>“Hey Dillu, stop voice”</b><span>Stops spoken updates</span></div>
+      <div><b>“Hey Dillu, show fundamentals”</b><span>Opens fundamentals for selected stock</span></div>
+    </div>
+    <div class="command-status" id="commandStatus">Ready for your command.</div>
+    <button class="primary full" id="listenCommand">🎤 Listen for Command</button>
+  </div>
+</div>
+
+
+<div id="voiceCommandPanel" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow">DILLU VOICE ASSISTANT</div>
+        <h3>Hey Dillu — Smart Commands</h3>
+        <p class="muted">English • हिंदी • తెలుగు</p>
+      </div>
+      <button class="icon-btn" id="closeVoicePanel">✕</button>
+    </div>
+    <div class="command-list">
+      <div><b>“Hey Dillu, open Reliance”</b><span>Opens the stock</span></div>
+      <div><b>“Hey Dillu, Reliance price”</b><span>Current price + change</span></div>
+      <div><b>“Hey Dillu, Reliance old price” / “previous close”</b><span>Yesterday's closing price</span></div>
+      <div><b>“Hey Dillu, Reliance opening price”</b><span>Today's opening price</span></div>
+      <div><b>“Hey Dillu, Reliance day high / day low”</b><span>Today's high or low</span></div>
+      <div><b>“Hey Dillu, Reliance 52 week high / low”</b><span>52-week high or low</span></div>
+      <div><b>“Hey Dillu, Reliance volume”</b><span>Traded volume</span></div>
+      <div><b>“Hey Dillu, Reliance change” / “how much up”</b><span>Today's gain or loss</span></div>
+      <div><b>“Hey Dillu, everything about Reliance”</b><span>Speaks a full summary: price, old price, change, high/low</span></div>
+      <div><b>“Hey Dillu, buy 10 Reliance”</b><span>Creates an order preview; execution requires confirmation</span></div>
+      <div><b>“Hey Dillu, sell 5 TCS”</b><span>Creates a sell preview; execution requires confirmation</span></div>
+      <div><b>“Hey Dillu, Reliance future ఎలా ఉంది?”</b><span>Gives a data-based outlook, never a guaranteed prediction</span></div>
+      <div><b>“Hey Dillu, Infosys watchlist లో add చెయ్”</b><span>Adds a stock to watchlist</span></div>
+      <div><b>“Hey Dillu, Reliance alert 3000 పెట్టు”</b><span>Creates a price alert</span></div>
+      <div><b>“Hey Dillu, stop voice” / “start voice”</b><span>Stops or starts the 1-second spoken updates</span></div>
+    </div>
+    <div class="command-status" id="voiceCommandStatus">Ready. Tap the microphone and speak.</div>
+    <div class="order-preview hidden" id="orderPreview"></div>
+    <button class="primary full" id="listenVoiceCommand">🎤 Listen</button>
+  </div>
+</div>
+
+</body>
+</html>
